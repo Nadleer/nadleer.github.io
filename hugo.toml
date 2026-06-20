@@ -2,11 +2,11 @@
 #  EDIT THIS LINE after you create the GitHub repo:
 #  For a user site the repo MUST be named  <username>.github.io
 #  and baseURL becomes  https://<username>.github.io/
-baseURL = "https://USERNAME.github.io/"
+baseURL = "https://nadleer.github.io/"
 # ─────────────────────────────────────────────────────────────
 
 title = "nadler // security research"
-languageCode = "en-us"
+locale = "en-us"
 theme = "PaperMod"
 
 enableRobotsTXT = true
@@ -50,7 +50,7 @@ All findings are disclosed responsibly and only after the affected program has r
     url = "https://hackerone.com/nadler"
   [[params.socialIcons]]
     name = "github"
-    url = "https://github.com/USERNAME"
+    url = "https://github.com/nadleer"
   [[params.socialIcons]]
     name = "rss"
     url = "index.xml"
