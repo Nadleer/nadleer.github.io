@@ -38,22 +38,8 @@ pygmentsUseClasses = true
   comments = false
 
   [params.homeInfoParams]
-    Title = "nadler 👋"
-    Content = """
-Bug bounty hunter & penetration tester. I publish write-ups of vulnerabilities I find, offensive-security techniques, and recon/automation notes.
-
-All findings are disclosed responsibly and only after the affected program has remediated or authorized disclosure.
-"""
-
-  [[params.socialIcons]]
-    name = "hackerone"
-    url = "https://hackerone.com/nadler"
-  [[params.socialIcons]]
-    name = "github"
-    url = "https://github.com/nadleer"
-  [[params.socialIcons]]
-    name = "rss"
-    url = "index.xml"
+    Title = "nadler"
+    Content = '<img src="/images/pfp.png" alt="nadler" width="240" height="135" style="border-radius:8px;margin-top:.5rem;">'
 
   [params.assets]
     disableHLJS = true
@@ -77,6 +63,9 @@ All findings are disclosed responsibly and only after the affected program has r
     name = "Posts"
     url = "/posts/"
     weight = 10
+
+[markup.goldmark.renderer]
+  unsafe = true
 
 [markup.highlight]
   noClasses = false
