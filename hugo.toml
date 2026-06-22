@@ -69,7 +69,7 @@ All findings are disclosed responsibly and only after the affected program has r
     keys = ["title", "permalink", "summary", "content"]
 
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "RSS"]
 
 [menu]
   [[menu.main]]
@@ -77,26 +77,6 @@ All findings are disclosed responsibly and only after the affected program has r
     name = "Posts"
     url = "/posts/"
     weight = 10
-  [[menu.main]]
-    identifier = "archives"
-    name = "Archive"
-    url = "/archives/"
-    weight = 20
-  [[menu.main]]
-    identifier = "search"
-    name = "Search"
-    url = "/search/"
-    weight = 30
-  [[menu.main]]
-    identifier = "tags"
-    name = "Tags"
-    url = "/tags/"
-    weight = 40
-  [[menu.main]]
-    identifier = "about"
-    name = "About"
-    url = "/about/"
-    weight = 50
 
 [markup.highlight]
   noClasses = false
