@@ -92,12 +92,7 @@ what makes this a vuln and not a normal "report this post" feature:
 - **no rate limit**, so you can sweep a whole creator's feed, not just one post.
 - the victim can't trivially undo it themselves.
 
-## impact
-
-any authenticated user can unilaterally take down arbitrary content. concretely:
-silence a competitor's announcement, suppress a creator/journalist, mass-hide a
-target's entire feed, or extort ("pay or your posts stay hidden"). it's a
-content-integrity / censorship primitive available to every logged-in user.
-
 **class:** broken function-level authorization (BFLA) — a privileged moderation
 action exposed with no role check, and no object-level ownership scoping.
+
+i got rewarded $$$ from this bug. thanks for reading!
