@@ -39,15 +39,10 @@ pygmentsUseClasses = true
 
   [params.homeInfoParams]
     Title = "nadler"
-    Content = '''
-<div class="home-profile">
-  <img class="home-pfp" src="/images/pfp.png" alt="nadler" width="240" height="135">
-  <div class="home-whoami">
-    <p class="home-kicker">$ whoami</p>
-    <p class="home-bio">Security researcher and penetration tester focused on bug bounty, web application security, API authorization, and practical exploit chains.</p>
-  </div>
-</div>
-'''
+    Content = "Security researcher and penetration tester focused on web applications, API authorization, and the exploit chains hiding between intended behavior and what is actually possible."
+
+  [params.label]
+    text = "nadler"
 
   [params.assets]
     disableHLJS = true

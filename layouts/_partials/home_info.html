@@ -1,11 +1,67 @@
 {{- with site.Params.homeInfoParams }}
 <article class="first-entry home-info">
-    <header class="entry-header">
-        <h1>{{ .Title | markdownify }}</h1>
-    </header>
-    <div class="entry-content md-content">
-        {{ $opts := dict "display" "block" }}
-        {{ .Content | $.Page.RenderString $opts }}
+    <div class="hero-grid">
+        <div class="hero-copy">
+            <p class="hero-eyebrow"><span class="status-dot" aria-hidden="true"></span> Independent security research</p>
+            <header class="entry-header">
+                <p class="hero-handle">@{{ .Title | plainify }}</p>
+                <h1>I find the gap between <em>intended</em> and <em>possible.</em></h1>
+            </header>
+            <div class="entry-content hero-intro">
+                {{ $opts := dict "display" "block" }}
+                {{ .Content | $.Page.RenderString $opts }}
+            </div>
+            <div class="hero-actions">
+                <a class="button button-primary" href="{{ "posts/" | relURL }}">
+                    Explore the research
+                    <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11M11 6l4 4-4 4" /></svg>
+                </a>
+                <a class="button button-secondary" href="https://hackerone.com/nadler" target="_blank" rel="noopener noreferrer me">
+                    HackerOne profile
+                    <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M7 5h8v8M15 5 6 14" /></svg>
+                </a>
+            </div>
+            <ul class="hero-disciplines" aria-label="Research specialties">
+                <li><span>01</span> Web security</li>
+                <li><span>02</span> API authorization</li>
+                <li><span>03</span> Exploit chains</li>
+            </ul>
+        </div>
+
+        <aside class="hero-visual" aria-label="Researcher profile">
+            <div class="profile-window">
+                <div class="window-bar" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                    <p>researcher.profile</p>
+                </div>
+                <div class="profile-image-wrap">
+                    <span class="image-index">N—01</span>
+                    <img class="home-pfp" src="{{ "images/pfp.png" | relURL }}" alt="Illustrated portrait of Nadler" width="480" height="270">
+                </div>
+                <div class="profile-meta">
+                    <div>
+                        <span>Specialization</span>
+                        <strong>Web · API · AuthZ</strong>
+                    </div>
+                    <div>
+                        <span>Method</span>
+                        <strong>Evidence first</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="signal-card">
+                <span class="signal-icon" aria-hidden="true">↳</span>
+                <p><small>Current focus</small><strong>Breaking trust boundaries</strong></p>
+            </div>
+        </aside>
     </div>
 </article>
+
+<section class="research-heading" aria-labelledby="research-log-title">
+    <div>
+        <p class="section-kicker">Field notes / write-ups</p>
+        <h2 id="research-log-title">Latest research</h2>
+    </div>
+    <a href="{{ "posts/" | relURL }}">View all posts <span aria-hidden="true">↗</span></a>
+</section>
 {{- end -}}

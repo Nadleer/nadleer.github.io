@@ -5,8 +5,8 @@ draft: false
 tags: ["broken access control", "BAC", "api", "writeup"]
 categories: ["findings"]
 cover:
-  image: "" # optional: put an image in static/images and reference /images/foo.png
-  alt: ""
+  image: "images/covers/moderation-route-bypass.webp"
+  alt: "Abstract diagram of parallel API moderation routes where one bypasses an authorization checkpoint"
   caption: ""
 ---
 

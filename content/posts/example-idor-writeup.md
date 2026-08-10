@@ -6,8 +6,8 @@ tags: ["idor", "bola", "api", "writeup"]
 categories: ["findings"]
 summary: "A reusable write-up template — copy this file to start a new finding post."
 cover:
-  image: ""        # optional: put an image in static/images and reference /images/foo.png
-  alt: ""
+  image: "images/covers/idor-invoice-boundary.webp"
+  alt: "Abstract diagram of an API request crossing a tenant boundary to access another organization's document"
   caption: ""
 ---
 
